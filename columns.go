@@ -121,7 +121,7 @@ func columnNames(model reflect.Value, strict bool, excluded ...string) []string 
 			continue
 		}
 
-		if supportedColumnType(valField.Kind()) || isValidSqlValue(valField) {
+		if supportedColumnType(valField) || isValidSqlValue(valField) {
 			names = append(names, fieldName)
 		}
 	}
@@ -152,13 +152,15 @@ func reflectValue(v interface{}) (reflect.Value, error) {
 	return vVal, nil
 }
 
-func supportedColumnType(k reflect.Kind) bool {
-	switch k {
+func supportedColumnType(v reflect.Value) bool {
+	switch v.Kind() {
 	case reflect.Bool, reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32,
 		reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32,
 		reflect.Uint64, reflect.Float32, reflect.Float64, reflect.Interface,
 		reflect.String:
 		return true
+	case reflect.Ptr:
+		return supportedColumnType(v.Elem())
 	default:
 		return false
 	}

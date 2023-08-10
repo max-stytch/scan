@@ -44,6 +44,18 @@ func TestColumnsReturnsStructTags(t *testing.T) {
 	assert.EqualValues(t, []string{"name"}, cols)
 }
 
+func TestColumnsReturnsStructTagsWithPointers(t *testing.T) {
+	type personUpdate struct {
+		Name *string `db:"name"`
+	}
+
+	cols, err := Columns(&personUpdate{
+		Name: ptr("Joe"),
+	})
+	assert.NoError(t, err)
+	assert.EqualValues(t, []string{"name"}, cols)
+}
+
 func TestColumnsReturnsStructTagsAndFieldNames(t *testing.T) {
 	type person struct {
 		Name string `db:"name"`
@@ -309,4 +321,8 @@ func BenchmarkColumnsLargeStruct(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Columns(ls)
 	}
+}
+
+func ptr(s string) *string {
+	return &s
 }

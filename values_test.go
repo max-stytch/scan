@@ -34,6 +34,18 @@ func TestValuesScansDBTags(t *testing.T) {
 	assert.EqualValues(t, []interface{}{"Brett"}, vals)
 }
 
+func TestValuesScansPointerDBTags(t *testing.T) {
+	type person struct {
+		Name *string `db:"n"`
+	}
+
+	p := &person{Name: ptr("Brett")}
+	vals, err := Values([]string{"n"}, p)
+	require.NoError(t, err)
+
+	assert.EqualValues(t, []interface{}{ptr("Brett")}, vals)
+}
+
 func TestValuesScansNestedFields(t *testing.T) {
 	type Address struct {
 		Street string
